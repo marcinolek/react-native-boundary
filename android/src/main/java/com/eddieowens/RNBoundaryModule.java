@@ -102,7 +102,8 @@ public class RNBoundaryModule extends ReactContextBaseJavaModule implements Life
     private Geofence createGeofence(ReadableMap readableMap) {
         return new Geofence.Builder()
                 .setRequestId(readableMap.getString("id"))
-                .setCircularRegion(readableMap.getDouble("lat"), readableMap.getDouble("lng"), (float) readableMap.getDouble("radius"))
+                .setCircularRegion(readableMap.getDouble("lat"), readableMap.getDouble("lng"),
+                        (float) readableMap.getDouble("radius"))
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .build();
@@ -135,27 +136,31 @@ public class RNBoundaryModule extends ReactContextBaseJavaModule implements Life
             return mBoundaryPendingIntent;
         }
         Intent intent = new Intent(getReactApplicationContext(), BoundaryEventBroadcastReceiver.class);
-        mBoundaryPendingIntent = PendingIntent.getBroadcast(getReactApplicationContext(), 0, intent, PendingIntent.
-                FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE );
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mBoundaryPendingIntent = PendingIntent.getBroadcast(getReactApplicationContext(), 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        } else {
+            mBoundaryPendingIntent = PendingIntent.getBroadcast(getReactApplicationContext(), 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+        }
         return mBoundaryPendingIntent;
     }
 
-    private void addGeofence(final Promise promise, final GeofencingRequest geofencingRequest, final WritableArray geofenceRequestIds) {
-        int permission = ActivityCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-
+    private void addGeofence(final Promise promise, final GeofencingRequest geofencingRequest,
+            final WritableArray geofenceRequestIds) {
+        int permission = ActivityCompat.checkSelfPermission(getReactApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             permission = requestPermissions();
         }
-
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             promise.reject("PERM", "Access fine location is not permitted");
         } else {
             mGeofencingClient.addGeofences(
                     geofencingRequest,
-                    getBoundaryPendingIntent()
-            )
+                    getBoundaryPendingIntent())
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -173,8 +178,8 @@ public class RNBoundaryModule extends ReactContextBaseJavaModule implements Life
     }
 
     private void addGeofence(final Promise promise, final GeofencingRequest geofencingRequest, final String requestId) {
-        int permission = ActivityCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-
+        int permission = ActivityCompat.checkSelfPermission(getReactApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             permission = requestPermissions();
@@ -187,8 +192,7 @@ public class RNBoundaryModule extends ReactContextBaseJavaModule implements Life
 
             mGeofencingClient.addGeofences(
                     geofencingRequest,
-                    getBoundaryPendingIntent()
-            )
+                    getBoundaryPendingIntent())
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -227,12 +231,13 @@ public class RNBoundaryModule extends ReactContextBaseJavaModule implements Life
 
     private int requestPermissions() {
         ActivityCompat.requestPermissions(getReactApplicationContext().getCurrentActivity(),
-                new String[]{
+                new String[] {
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION
                 }, 1);
 
-        return ActivityCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+        return ActivityCompat.checkSelfPermission(getReactApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
     @Override
