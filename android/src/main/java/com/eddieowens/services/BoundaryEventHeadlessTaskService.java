@@ -35,10 +35,10 @@ public class BoundaryEventHeadlessTaskService extends HeadlessJsTaskService {
     protected HeadlessJsTaskConfig getTaskConfig(Intent intent) {
         Bundle extras = intent.getExtras();
         return new HeadlessJsTaskConfig(
-            "OnBoundaryEvent",
-            extras != null ? Arguments.fromBundle(extras) : null,
-            5000,
-            true);
+                "OnBoundaryEvent",
+                extras != null ? Arguments.fromBundle(extras) : null,
+                5000,
+                true);
     }
 
     public NotificationCompat.Builder getNotificationBuilder() {
@@ -48,7 +48,8 @@ public class BoundaryEventHeadlessTaskService extends HeadlessJsTaskService {
         int iconResource = -1;
 
         try {
-            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),
+                    PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
             title = bundle.getString(KEY_NOTIFICATION_TITLE, title);
             text = bundle.getString(KEY_NOTIFICATION_TEXT, text);
@@ -57,13 +58,12 @@ public class BoundaryEventHeadlessTaskService extends HeadlessJsTaskService {
             Log.e(TAG, "Cannot get application Bundle " + e.toString());
         }
 
-
         // Notification for the foreground service
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(title)
-            .setContentText(text)
-            .setOngoing(true)
-            .setColor(ContextCompat.getColor(context, R.color.accent_material_light));
+                .setContentTitle(title)
+                .setContentText(text)
+                .setOngoing(true);
+        // .setColor(ContextCompat.getColor(context, R.color.accent_material_light));
 
         if (iconResource > -1) {
             builder.setSmallIcon(iconResource);
