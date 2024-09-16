@@ -12,7 +12,7 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service android:name="com.eddieowens.services.BoundaryEventHeadlessTaskService" />
+        <service android:name="com.eddieowens.services.BoundaryEventHeadlessTaskService"  android:foregroundServiceType="location" />
 
         <!-- Receivers -->
         <receiver
